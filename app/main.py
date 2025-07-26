@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 # Routers
-from app.routers import auth as auth_router
-from app.routers import claim_result as claim_result_router
+from app.routers import auth as auth_router, trip_route
+from app.routers import culturetrip_route
+from app.routers import itinerary_route
 # End of routers
+
 import logging
 
 from app.shared.errors import AppError
@@ -61,11 +63,14 @@ def read_root():
     return {"message": "Welcome to FastAPI + MySQL 🚀"}
 
 
+
+
 # Register your sub-routers to the main router
 api_router.include_router(auth_router.router, prefix="/auth", tags=["Auth"])
+api_router.include_router(culturetrip_route.router, prefix="/ct-planner", tags=["Culture Trip Enpoints"])
+api_router.include_router(trip_route.router, prefix="/trip", tags=["Validate User Input request Enpoints"])
+api_router.include_router(itinerary_route.router, prefix="/endpoint", tags=["Itinerary"])
 
-# api_router.include_router(text_extraction_router.router, prefix="/nlp", tags=["NLP"])
-# api_router.include_router(claim_result_router.router, prefix="/claim", tags=["Claims Endpoint"])
-
-# Include the main API router into your FastAPI app
+# Include the main API router into your FastAPI app. This should be at the bottom of the api_router
 app.include_router(api_router)
+

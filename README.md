@@ -84,16 +84,16 @@ http://127.0.0.1:8000/docs → Swagger UI
 
 # 1. Create and switch to the new branch
 
-git checkout -b qloo-pipeline
+git checkout -b llm-ai-trip
 
 # 2. Now you're on qloo-pipeline branch. Just add and commit your changes:
 
 git add .
-git commit -m "Initial commit for NLP pipeline"
+git commit -m "LLM codes to generate trip"
 
 # 3. Push the branch to remote
 
-git push origin qloo-pipeline
+git push origin llm-ai-trip
 
 # 4. Switch back to the main branch
 
