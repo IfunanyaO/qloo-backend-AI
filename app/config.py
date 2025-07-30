@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     POSTGRES_PORT:str
     QLOO_API_KEY:str
     QLOO_BASE:str
+    WEATHERAPPID:str
 
     class Config:
         env_file = ".env"

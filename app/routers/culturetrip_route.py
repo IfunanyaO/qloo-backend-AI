@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List
-from app.services.llm_service import generate_itinerary
+from app.database import async_session_maker
+from app.routers.student_route import save_user_itinerary
+from app.services.llm_service import fetch_weather_forecast, generate_itinerary
 from app.services.qloo_service import get_insight
 
 
@@ -13,6 +15,7 @@ class TripPlanRequest(BaseModel):
     duration: str
     tastes: List[str] # e.g., ["jazz", "seafood", "indie"]
     style: List[str]
+    original_prompt: str  # New field added
 
 @router.get("/test-endpoint")
 def read_root():
@@ -25,6 +28,7 @@ async def plan_trip(payload: TripPlanRequest):
     tastes = payload.tastes
     style = payload.style
     duration = payload.duration
+    original_prompt = payload.original_prompt
 
     if not destination or not tastes:
         raise HTTPException(status_code=400, detail="Both 'destination' and at least one 'taste' are required.")
@@ -61,17 +65,37 @@ async def plan_trip(payload: TripPlanRequest):
             heatmap_points = heatmap.get("data", {}).get("points", [])
             heatmap_neighborhoods.extend([f"Lat:{pt['location']['latitude']:.4f}, Lon:{pt['location']['longitude']:.4f}" for pt in heatmap_points[:3]])
 
+        weather_forecast = fetch_weather_forecast(destination, original_prompt)
         # Call the LLM itinerary builder
         itinerary = generate_itinerary(
+            # openAI_model=request.model,
+            openAI_model="gpt-4",
+            original_prompt=original_prompt,
             destination=destination,
             duration=duration,
             tastes=tastes,
             style=style,
             qloo_places=all_places,
+            weather_forecast=weather_forecast,
             demographics_summary="\n".join(demographics_summary),
             related_tags=related_tags,  # optional
             heatmap_neighborhoods=heatmap_neighborhoods
         )
+
+        # Step 7: Save to PostgreSQL
+        async with async_session_maker() as db:
+            if getattr(payload, "loggedIn", False) is True:
+                print("📅 Saving User history itinerary")
+                await save_user_itinerary(
+                    db=db,
+                    user_id=getattr(payload, "sessionId", None),
+                    prompt=original_prompt,
+                    destination=destination,
+                    duration=duration,
+                    tastes=tastes,
+                    style=style,
+                    generated_itinerary=itinerary
+                )
 
         return {
             "destination": destination,

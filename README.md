@@ -84,16 +84,16 @@ http://127.0.0.1:8000/docs → Swagger UI
 
 # 1. Create and switch to the new branch
 
-git checkout -b llm-ai-trip
+git checkout -b LLM-userhistory
 
 # 2. Now you're on qloo-pipeline branch. Just add and commit your changes:
 
 git add .
-git commit -m "LLM codes to generate trip"
+git commit -m "LLM codes with user history and data formatting"
 
 # 3. Push the branch to remote
 
-git push origin llm-ai-trip
+git push origin LLM-userhistory
 
 # 4. Switch back to the main branch
 
@@ -105,7 +105,7 @@ git pull origin main
 
 # 6. Merge the changes from qloo-pipeline into main
 
-git merge qloo-pipeline
+git merge LLM-userhistory
 
 # 7.
 

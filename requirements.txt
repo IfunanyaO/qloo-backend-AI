@@ -26,4 +26,4 @@ asyncpg
 databases
 psycopg2-binary
 python-jose
-
+python-dateutil

@@ -118,3 +118,91 @@ Need Help With?
 🧠 Building a chat interface around this logic?
 
 Just say the word, Captain CultureTrip 🧳✨
+
+
+
+
+
+
+def generate_itinerary(
+    original_prompt: str,
+    destination: str,
+    duration: str,
+    tastes: List[str],
+    style: List[str],
+    qloo_places: List[dict] = None,
+    weather_forecast: str = "",
+    demographics_summary: str = "",
+    related_tags: List[str] = [],
+    heatmap_neighborhoods: List[str] = []
+) -> str:
+    qloo_places = qloo_places or []
+
+    def format_place(place):
+        name = place.get("name", "Unknown Place")
+        props = place.get("properties", {})
+        address = props.get("address", "")
+        website = props.get("website", "")
+        phone = props.get("phone", "")
+        rating = props.get("business_rating")
+        cost_estimate = props.get("average_cost", "Estimate not available")
+        keywords = [kw["name"] for kw in props.get("keywords", [])][:3]
+
+        details = f"""- **{name}**
+  📍 [Map it](https://www.google.com/maps/search/?api=1&query={name.replace(' ', '+')}+{destination})
+  {'📞 ' + phone if phone else ''}
+  {'🌐 ' + website if website else ''}
+  {'⭐ Rating: ' + str(rating) if rating else ''}
+  {'💸 Estimated cost: ' + str(cost_estimate) if cost_estimate else ''}
+  {'🔑 Keywords: ' + ', '.join(keywords) if keywords else ''}
+"""
+        return details
+
+    formatted_places = "\n".join([format_place(place) for place in qloo_places]) or "No recommended places available."
+    weather_forecast = fetch_weather_forecast(destination)
+
+    # Compose the GPT prompt
+    prompt = f"""
+You are a culturally intelligent travel planner.
+
+A user said: "{original_prompt}"
+
+Create a personalized **{duration}** itinerary for a trip to **{destination}**. The traveler prefers:
+
+**Tastes**: {', '.join(tastes)}
+**Travel Style**: {', '.join(style)}
+**Weather Forecast**: 
+{weather_forecast}
+
+Use the following place insights to plan activities. Include them in appropriate time slots (morning, afternoon, evening):
+
+{formatted_places}
+
+Also consider:
+- **Demographics**: {demographics_summary or "N/A"}
+- **Related Tags**: {', '.join(related_tags) or "N/A"}
+- **Hotspots**: {', '.join(heatmap_neighborhoods) or "N/A"}
+
+For each day:
+- Suggest a **morning**, **afternoon**, and **evening** activity
+- Mention if a place has a **high rating**, **website**, or **keywords** that align with tastes
+- Add a **rough cost range** if available or say "budget-friendly" if unknown
+- Suggest ideal times to go if it’s a meal place, music venue, bookstore, etc.
+- Incorporate any additional details or context found in the original user input: {original_prompt}
+- Reference weather conditions gotten from **Weather Forecast**: 
+{weather_forecast}
+
+End the itinerary with a short, stylish **trip summary caption** (Instagram-worthy).
+
+Make the format readable and fun!
+"""
+
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You are a culturally intelligent travel planner that creates rich, fun, and personalized itineraries."},
+            {"role": "user", "content": prompt}
+        ]
+    )
+
+    return response.choices[0].message.content

@@ -6,3 +6,4 @@ class TripData(BaseModel):
     duration: str
     tastes: List[str]
     style: List[str]
+    original_prompt: str 

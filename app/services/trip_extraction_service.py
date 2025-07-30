@@ -29,9 +29,9 @@ def validate_user_input(user_input: str) -> bool:
     return response.choices[0].message.content.strip().lower() == "true"
 
 
-def generate_trip_json(user_input: str) -> str:
+def generate_trip_json(user_input: str, openAI_model:str) -> str:
     response = client.chat.completions.create(
-        model="gpt-4",
+        model=openAI_model,
         messages=[
             {
                 "role": "system",
@@ -47,10 +47,12 @@ def generate_trip_json(user_input: str) -> str:
     return response.choices[0].message.content
 
 
-def parse_trip_data(json_str: str) -> TripData:
+def parse_trip_data(json_str: str, original_prompt: str) -> TripData:
     try:
         structured = json.loads(json_str)
+        structured["original_prompt"] = original_prompt  # Inject the original prompt
         return TripData(**structured)
+    
     except (ValidationError, json.JSONDecodeError) as e:
         raise ValueError(
             "Invalid trip structure. Please include destination, duration, tastes, and travel style."

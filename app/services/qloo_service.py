@@ -1,9 +1,10 @@
 import os
 from dotenv import load_dotenv
+load_dotenv()
 import httpx
 from fastapi import HTTPException
 
-load_dotenv()
+
 
 QLOO_API_KEY = os.getenv("QLOO_API_KEY")
 QLOO_BASE_URL = os.getenv("QLOO_BASE_URL", "https://hackathon.api.qloo.com")
@@ -17,6 +18,7 @@ async def get_insight(endpoint: str) -> dict:
     }
 
     url = f"{QLOO_BASE_URL}/v2{endpoint}"
+    print(url)
 
     try:
         async with httpx.AsyncClient() as client:

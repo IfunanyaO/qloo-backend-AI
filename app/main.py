@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 # Routers
-from app.routers import auth as auth_router, trip_route
+from app.routers import auth as auth_router, student_route, trip_route
 from app.routers import culturetrip_route
 from app.routers import itinerary_route
 # End of routers
@@ -70,6 +70,7 @@ api_router.include_router(auth_router.router, prefix="/auth", tags=["Auth"])
 api_router.include_router(culturetrip_route.router, prefix="/ct-planner", tags=["Culture Trip Enpoints"])
 api_router.include_router(trip_route.router, prefix="/trip", tags=["Validate User Input request Enpoints"])
 api_router.include_router(itinerary_route.router, prefix="/endpoint", tags=["Itinerary"])
+api_router.include_router(student_route.router, prefix="/sql", tags=["Database Testing"])
 
 # Include the main API router into your FastAPI app. This should be at the bottom of the api_router
 app.include_router(api_router)
