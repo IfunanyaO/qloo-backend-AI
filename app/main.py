@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 # Routers
 from app.routers import auth as auth_router, student_route, trip_route
+from app.routers import text_extraction as text_extraction_router
 from app.routers import culturetrip_route
 from app.routers import itinerary_route
 # End of routers
@@ -66,6 +67,7 @@ def read_root():
 
 
 # Register your sub-routers to the main router
+api_router.include_router(text_extraction_router.router, prefix="/nlp", tags=["NLP"])
 api_router.include_router(auth_router.router, prefix="/auth", tags=["Auth"])
 api_router.include_router(culturetrip_route.router, prefix="/ct-planner", tags=["Culture Trip Enpoints"])
 api_router.include_router(trip_route.router, prefix="/trip", tags=["Validate User Input request Enpoints"])

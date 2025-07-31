@@ -82,6 +82,9 @@ async def plan_trip(payload: TripPlanRequest):
             heatmap_neighborhoods=heatmap_neighborhoods
         )
 
+        tastes_str = ", ".join(tastes)  # tastes is a list
+        style_str = ", ".join(style)    # style is a list
+
         # Step 7: Save to PostgreSQL
         async with async_session_maker() as db:
             if getattr(payload, "loggedIn", False) is True:
@@ -92,8 +95,8 @@ async def plan_trip(payload: TripPlanRequest):
                     prompt=original_prompt,
                     destination=destination,
                     duration=duration,
-                    tastes=tastes,
-                    style=style,
+                    tastes=tastes_str,
+                    style=style_str,
                     generated_itinerary=itinerary
                 )
 

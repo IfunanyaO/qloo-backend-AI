@@ -69,6 +69,9 @@ async def plan_trip(request: PromptRequest):
         )
         print("📅 Generated itinerary")
 
+        tastes_str = ", ".join(tastes)  # tastes is a list
+        style_str = ", ".join(style)    # style is a list
+
         # Step 7: Save to PostgreSQL
         async with async_session_maker() as db:
             if getattr(request, "loggedIn", False) is True:
@@ -79,8 +82,8 @@ async def plan_trip(request: PromptRequest):
                     prompt=prompt,
                     destination=destination,
                     duration=duration,
-                    tastes=tastes,
-                    style=style,
+                    tastes=tastes_str,
+                    style=style_str,
                     generated_itinerary=itinerary
                 )
 
